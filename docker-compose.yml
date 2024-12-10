@@ -1,0 +1,42 @@
+
+services:
+  nginx:
+    build: ./nginx/
+    ports:
+      - 80:80
+    volumes:
+      - ./php_code/:/var/www/html/
+
+  php:
+    build: ./php_code/
+    expose:
+      - 9000
+    volumes:
+      - ./php_code/:/var/www/html/
+    environment:
+      - DB_SERVER=${DB_SERVER}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - DB_NAME_ADMIN_2=${DB_NAME_ADMIN_2}
+      - DB_NAME_ADMIN_PANEL=${DB_NAME_ADMIN_PANEL}
+
+  db:    
+    image: mariadb  
+    volumes: 
+      - mysql-data:/var/lib/mysql
+    environment:  
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"    
+    depends_on:
+      - db    
+    environment:
+      - PMA_ARBITRARY=1
+
+volumes:
+    mysql-data:
